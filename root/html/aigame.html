@@ -1,0 +1,169 @@
+<!-- 
+Be creative. Here are some examples of what other students have done. 
+Keep in mind that the first three are fairly basic. 
+To merit full credit on an app like one of these first three would require you to creatively contribute 
+(either in style or function) to what the AI comes up with to go beyond a basic app.
+        Riddle generator
+        Joke generator
+        Number guessing game
+        Snake game
+        Wordle clone
+Try to keep the code for this app in a single page (e.g., styles, html, and scripts all on one page).
+This page should be accessible via a link from the scratch page.
+
+Rarely will the AI get it right on the first attempt. 
+Feel free to iterate and refine with the AI until it meets your expectations. 
+You are also encouraged to edit the AI solution to be just how you want it. -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Game</title>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        canvas {
+            border: 2px solid white;
+            background-color: black;
+        }
+
+        .score {
+            color: white;
+            font-size: 30px;
+            text-align: center;
+            position: absolute;
+            top: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="score">
+        <span id="player1Score">0</span> - <span id="player2Score">0</span>
+    </div>
+    <canvas id="pong" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('pong');
+        const context = canvas.getContext('2d');
+
+        // Create the Pong paddle
+        const paddleWidth = 10, paddleHeight = 100;
+        const player1 = { x: 0, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, color: 'white', dy: 0 };
+        const player2 = { x: canvas.width - paddleWidth, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, color: 'white', dy: 0 };
+
+        // Create the ball
+        const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 10, speed: 5, dx: 5, dy: 5, color: 'white' };
+
+        let player1Score = 0, player2Score = 0;
+
+        // Draw function
+        function draw() {
+            // Clear canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw paddles
+            context.fillStyle = player1.color;
+            context.fillRect(player1.x, player1.y, player1.width, player1.height);
+            context.fillStyle = player2.color;
+            context.fillRect(player2.x, player2.y, player2.width, player2.height);
+
+            // Draw ball
+            context.beginPath();
+            context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2, false);
+            context.fillStyle = ball.color;
+            context.fill();
+            context.closePath();
+
+            // Update ball position
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Ball collision with top and bottom
+            if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= canvas.height) {
+                ball.dy = -ball.dy;
+            }
+
+            // Ball collision with paddles
+            if (ball.x - ball.radius <= player1.x + player1.width && ball.y >= player1.y && ball.y <= player1.y + player1.height ||
+                ball.x + ball.radius >= player2.x && ball.y >= player2.y && ball.y <= player2.y + player2.height) {
+                ball.dx = -ball.dx;
+            }
+
+            // Scoring
+            if (ball.x - ball.radius <= 0) {
+                player2Score++;
+                updateScore();
+                resetBall();
+            }
+            if (ball.x + ball.radius >= canvas.width) {
+                player1Score++;
+                updateScore();
+                resetBall();
+            }
+
+            // Move paddles
+            player1.y += player1.dy;
+            player2.y += player2.dy;
+
+            // Prevent paddles from moving out of bounds
+            if (player1.y < 0) player1.y = 0;
+            if (player1.y + player1.height > canvas.height) player1.y = canvas.height - player1.height;
+            if (player2.y < 0) player2.y = 0;
+            if (player2.y + player2.height > canvas.height) player2.y = canvas.height - player2.height;
+
+            // Request next frame
+            requestAnimationFrame(draw);
+        }
+
+        // Update the score
+        function updateScore() {
+            document.getElementById('player1Score').textContent = player1Score;
+            document.getElementById('player2Score').textContent = player2Score;
+        }
+
+        // Reset ball position
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.dx = -ball.dx;
+        }
+
+        // Keydown event for paddle movement
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') {
+                player2.dy = -10;
+            } else if (e.key === 'ArrowDown') {
+                player2.dy = 10;
+            }
+            if (e.key === 'w') {
+                player1.dy = -10;
+            } else if (e.key === 's') {
+                player1.dy = 10;
+            }
+        });
+
+        // Keyup event to stop paddle movement
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                player2.dy = 0;
+            }
+            if (e.key === 'w' || e.key === 's') {
+                player1.dy = 0;
+            }
+        });
+
+        // Start the game
+        draw();
+    </script>
+</body>
+</html>
